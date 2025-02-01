@@ -266,6 +266,145 @@ aside h3 {
     }
 }
 
+/* Enhanced Responsive Design */
+/* Tablet Breakpoint */
+@media (max-width: 992px) {
+    .container {
+        width: 95%;
+        padding: 1rem;
+    }
+
+    header h1 {
+        font-size: 2rem;
+    }
+
+    .paper h3 {
+        font-size: 1.5rem;
+    }
+
+    .drop-cap {
+        font-size: 3.5rem;
+    }
+}
+
+/* Mobile Breakpoint */
+@media (max-width: 768px) {
+    /* Typography adjustments */
+    body {
+        font-size: 16px;
+    }
+
+    header h1 {
+        font-size: 1.8rem;
+    }
+
+    /* Navigation adjustments */
+    nav ul {
+        padding: 0;
+    }
+
+    nav ul li {
+        display: block;
+        margin: 0.5rem 0;
+    }
+
+    nav ul li a {
+        display: block;
+        padding: 0.8rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+    }
+
+    /* Content adjustments */
+    .container {
+        width: 100%;
+        padding: 1rem;
+    }
+
+    .paper {
+        padding: 1rem;
+    }
+
+    .archive-list li {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .archive-list .author {
+        margin-top: 0.5rem;
+    }
+
+    /* Form adjustments */
+    .form-container {
+        padding: 0.5rem;
+    }
+
+    input[type="text"],
+    input[type="email"] {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    /* Image handling */
+    .profile-pic {
+        width: 120px;
+    }
+
+    /* Modal adjustments */
+    .modal-content {
+        width: 95%;
+        margin: 1rem;
+        padding: 1rem;
+    }
+
+    /* Drop cap adjustment */
+    .drop-cap {
+        font-size: 3rem;
+        margin-right: 0.1em;
+    }
+}
+
+/* Small Mobile Breakpoint */
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    .paper h3 {
+        font-size: 1.2rem;
+    }
+
+    .spotlight {
+        padding: 1rem;
+    }
+
+    .profile-pic {
+        width: 100px;
+    }
+}
+
+/* Print Styles */
+@media print {
+    body {
+        font-size: 12pt;
+        color: #000;
+        background: #fff;
+    }
+
+    header, footer, nav, .modal {
+        display: none;
+    }
+
+    a {
+        text-decoration: none;
+        color: #000;
+    }
+
+    article {
+        page-break-inside: avoid;
+    }
+}
+
 main {
     flex: 1 0 auto;
     /* ...existing main styles... */
