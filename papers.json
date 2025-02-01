@@ -1,0 +1,16 @@
+[
+  {
+    "title": "New Paper on Medieval History",
+    "abstract": "This paper discusses the impact of medieval culture...",
+    "author": "Alice Johnson",
+    "pdfLink": "papers/sample-paper-3.pdf",
+    "keywords": "Medieval History culture knights"
+  },
+  {
+    "title": "Renaissance Art and Its Influence",
+    "abstract": "An exploration of Renaissance art and its effects on modern society.",
+    "author": "Bob Williams",
+    "pdfLink": "papers/sample-paper-4.pdf",
+    "keywords": "Renaissance art culture modern"
+  }
+]
