@@ -17,23 +17,61 @@ document.addEventListener("DOMContentLoaded", function () {
   /* -------------------------------------------
        2. Dynamic Content Loading
        ------------------------------------------- */
+  const PAPERS_DATA = [
+    {
+      id: "1",
+      title: "The Impact of the Industrial Revolution on European Society",
+      author: "John Doe",
+      keywords: "Industrial Revolution European Society",
+      pdfLink: "papers/sample-paper-1.pdf"
+    },
+    {
+      id: "2",
+      title: "Revisiting the Causes of World War I",
+      author: "Jane Smith",
+      keywords: "World War I diplomacy conflict",
+      pdfLink: "papers/sample-paper-2.pdf"
+    },
+    {
+      id: "3",
+      title: "Medieval Trade Routes and Their Impact",
+      author: "Alice Johnson",
+      keywords: "medieval trade economics",
+      pdfLink: "papers/sample-paper-3.pdf"
+    }
+    // Add more papers as needed
+  ];
+
   const loadMoreBtn = document.getElementById("loadMore");
+  let loadedPaperIds = new Set();
+  let currentIndex = 0;
+  const PAPERS_PER_LOAD = 2;
+
   if (loadMoreBtn) {
     loadMoreBtn.addEventListener("click", function () {
-      // Fetch additional papers from papers.json
-      fetch("papers.json")
-        .then((response) => response.json())
-        .then((data) => {
-          const paperList = document.getElementById("paperList");
-          data.forEach(function (paper) {
-            const li = document.createElement("li");
-            li.setAttribute("data-keywords", paper.keywords);
-            li.innerHTML = `<a href="${paper.pdfLink}" target="_blank">${paper.title}</a>
-                              <span class="author">by ${paper.author}</span>`;
-            paperList.appendChild(li);
-          });
-        })
-        .catch((error) => console.error("Error loading papers:", error));
+      const paperList = document.getElementById("paperList");
+      let papersAdded = 0;
+
+      // Load next batch of papers
+      while (papersAdded < PAPERS_PER_LOAD && currentIndex < PAPERS_DATA.length) {
+        const paper = PAPERS_DATA[currentIndex];
+        if (!loadedPaperIds.has(paper.id)) {
+          const li = document.createElement("li");
+          li.setAttribute("data-keywords", paper.keywords);
+          li.innerHTML = `<a href="${paper.pdfLink}" target="_blank">${paper.title}</a>
+                         <span class="author">by ${paper.author}</span>`;
+          paperList.appendChild(li);
+          loadedPaperIds.add(paper.id);
+          papersAdded++;
+        }
+        currentIndex++;
+      }
+
+      // Disable button if all papers are loaded
+      if (currentIndex >= PAPERS_DATA.length) {
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.textContent = "No More Papers";
+      }
     });
   }
 
