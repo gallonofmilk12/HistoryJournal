@@ -115,12 +115,20 @@ document.addEventListener("DOMContentLoaded", function () {
     signupForm.addEventListener("submit", function (event) {
       const emailInput = document.getElementById("email");
       const formError = document.getElementById("formError");
+      const formSuccess = document.getElementById("formSuccess");
       const emailPattern = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+      
       if (!emailPattern.test(emailInput.value)) {
         event.preventDefault();
         formError.textContent = "Please enter a valid email address.";
+        formSuccess.style.display = "none";
       } else {
         formError.textContent = "";
+        // Form will submit to Google Forms
+        setTimeout(() => {
+          formSuccess.style.display = "block";
+          emailInput.value = ""; // Clear the input
+        }, 1000);
       }
     });
   }
