@@ -132,4 +132,18 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   }
+
+  /* -------------------------------------------
+       5. Scroll Detection and Back to Top Button
+       ------------------------------------------- */
+  document.addEventListener("scroll", function () {
+    const backToTop = document.getElementById("backToTop");
+    if(backToTop){
+        backToTop.style.display = window.scrollY > 300 ? "block" : "none";
+    }
+  });
+
+  document.getElementById("backToTop")?.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
 });

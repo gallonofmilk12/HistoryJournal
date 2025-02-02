@@ -64,37 +64,30 @@
       </div>
     </header>
 
-    <main>
-      <div class="container">
-        <h2>Archive of Papers</h2>
-        <p>
-          Below is a list of published papers. Use the search box to filter
-          papers.
-        </p>
-
-        <!-- Search Input for Filtering -->
-        <input type="text" id="searchInput" placeholder="Search papers..." />
-
-        <!-- Archive List -->
-        <ul id="paperList" class="archive-list">
-          <li data-keywords="Industrial Revolution European Society">
-            <a href="papers/sample-paper-1.pdf" target="_blank">
-              The Impact of the Industrial Revolution on European Society
-            </a>
-            <span class="author">by John Doe</span>
-          </li>
-          <li data-keywords="World War I diplomacy conflict">
-            <a href="papers/sample-paper-2.pdf" target="_blank">
-              Revisiting the Causes of World War I
-            </a>
-            <span class="author">by Jane Smith</span>
-          </li>
-          <!-- More entries can be dynamically loaded -->
-        </ul>
-
-        <!-- Dynamic Content Loading Button -->
-        <button id="loadMore">Load More</button>
+    <main class="container my-5">
+      <!-- Search Feature -->
+      <div class="mb-4">
+        <input type="text" id="searchInput" placeholder="Search papers..." class="form-control">
       </div>
+      <!-- Paper List -->
+      <ul id="paperList" class="archive-list">
+        <li data-keywords="Industrial Revolution European Society">
+          <a href="papers/sample-paper-1.pdf" target="_blank">
+            The Impact of the Industrial Revolution on European Society
+          </a>
+          <span class="author">by John Doe</span>
+        </li>
+        <li data-keywords="World War I diplomacy conflict">
+          <a href="papers/sample-paper-2.pdf" target="_blank">
+            Revisiting the Causes of World War I
+          </a>
+          <span class="author">by Jane Smith</span>
+        </li>
+        <!-- More entries can be dynamically loaded -->
+      </ul>
+
+      <!-- Dynamic Content Loading Button -->
+      <button id="loadMore">Load More</button>
     </main>
 
     <footer>
@@ -102,7 +95,21 @@
         <p>&copy; 2025 History Journal. All rights reserved.</p>
       </div>
     </footer>
-
+    <button id="backToTop">↑ Back to Top</button>
     <script src="scripts/main.js"></script>
+    <script>
+      const searchInput = document.getElementById("searchInput");
+      if (searchInput) {
+          searchInput.addEventListener("input", function () {
+              const query = this.value.toLowerCase();
+              const papers = document.querySelectorAll("#paperList li");
+              
+              papers.forEach(function (paper) {
+                  const title = paper.querySelector("a").textContent.toLowerCase();
+                  paper.style.display = title.includes(query) ? "" : "none";
+              });
+          });
+      }
+    </script>
   </body>
 </html>
