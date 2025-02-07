@@ -47,6 +47,7 @@
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
     />
     <link rel="stylesheet" href="styles/main.css" />
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
   </head>
   <body>
     <header>
@@ -65,29 +66,46 @@
     </header>
 
     <main class="container my-5">
-      <!-- Search Feature -->
-      <div class="mb-4">
-        <input type="text" id="searchInput" placeholder="Search papers..." class="form-control">
+      <div class="search-container mb-5">
+        <h2 class="mb-3">Research Archive</h2>
+        <div class="search-wrapper">
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Search papers..." 
+            class="form-control form-control-lg"
+            aria-label="Search research papers"
+          >
+          <div id="searchSuggestions" class="search-suggestions"></div>
+        </div>
       </div>
-      <!-- Paper List -->
-      <ul id="paperList" class="archive-list">
-        <li data-keywords="Industrial Revolution European Society">
-          <a href="papers/sample-paper-1.pdf" target="_blank">
-            The Impact of the Industrial Revolution on European Society
-          </a>
-          <span class="author">by John Doe</span>
-        </li>
-        <li data-keywords="World War I diplomacy conflict">
-          <a href="papers/sample-paper-2.pdf" target="_blank">
-            Revisiting the Causes of World War I
-          </a>
-          <span class="author">by Jane Smith</span>
-        </li>
-        <!-- More entries can be dynamically loaded -->
-      </ul>
 
-      <!-- Dynamic Content Loading Button -->
-      <button id="loadMore">Load More</button>
+      <!-- Filter sidebar will be inserted here by JavaScript -->
+      <div class="archive-wrapper">
+        <ul id="paperList" class="archive-list">
+          <li data-keywords="Industrial Revolution European Society" class="animate">
+            <div class="paper-content">
+              <h3>
+                <a href="papers/sample-paper-1.pdf" target="_blank">
+                  The Impact of the Industrial Revolution on European Society
+                </a>
+              </h3>
+              <span class="author">by John Doe</span>
+              <span class="date">Published: March 2025</span>
+            </div>
+          </li>
+          <li data-keywords="World War I diplomacy conflict">
+            <a href="papers/sample-paper-2.pdf" target="_blank">
+              Revisiting the Causes of World War I
+            </a>
+            <span class="author">by Jane Smith</span>
+          </li>
+          <!-- More entries can be dynamically loaded -->
+        </ul>
+        <!-- Pagination will be inserted here by JavaScript -->
+      </div>
+
+      <button id="loadMore" class="btn btn-lg mt-4">Load More</button>
     </main>
 
     <footer>

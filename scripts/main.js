@@ -146,4 +146,219 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("backToTop")?.addEventListener("click", function () {
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
+
+  /* --- Pagination System --- */
+  const itemsPerPage = 10;
+  let currentPage = 1;
+
+  function setupPagination() {
+      const papers = document.querySelectorAll("#paperList li");
+      const pageCount = Math.ceil(papers.length / itemsPerPage);
+      
+      // Hide all papers initially
+      papers.forEach(paper => paper.style.display = "none");
+      
+      // Show first page
+      showPage(1);
+      
+      // Create pagination controls
+      const paginationContainer = document.createElement("div");
+      paginationContainer.className = "pagination";
+      paginationContainer.innerHTML = `
+          <button id="prevPage" class="page-btn">Previous</button>
+          <span id="pageInfo">Page ${currentPage} of ${pageCount}</span>
+          <button id="nextPage" class="page-btn">Next</button>
+      `;
+      
+      document.querySelector(".archive-wrapper")?.appendChild(paginationContainer);
+      
+      setupPaginationEvents(pageCount);
+  }
+
+  /* --- Auto-Suggest Search using Lunr.js --- */
+  let searchIndex;
+  
+  async function setupSearch() {
+      const papers = Array.from(document.querySelectorAll("#paperList li")).map(paper => ({
+          id: paper.dataset.id,
+          title: paper.querySelector("a").textContent,
+          keywords: paper.dataset.keywords
+      }));
+      
+      searchIndex = lunr(function() {
+          this.field('title');
+          this.field('keywords');
+          
+          papers.forEach(paper => this.add(paper));
+      });
+      
+      const searchInput = document.getElementById("searchInput");
+      if (searchInput) {
+          searchInput.addEventListener("input", debounce(handleSearch, 300));
+      }
+  }
+
+  /* --- Dark Mode Toggle --- */
+  function setupDarkMode() {
+      const toggle = document.createElement("button");
+      toggle.id = "darkModeToggle";
+      toggle.innerHTML = "🌓";
+      toggle.className = "dark-mode-toggle";
+      
+      document.querySelector("header .container").appendChild(toggle);
+      
+      // Check user preference
+      if (localStorage.getItem("darkMode") === "enabled") {
+          document.body.classList.add("dark-mode");
+      }
+      
+      toggle.addEventListener("click", () => {
+          document.body.classList.toggle("dark-mode");
+          localStorage.setItem("darkMode", 
+              document.body.classList.contains("dark-mode") ? "enabled" : "disabled"
+          );
+      });
+  }
+
+  /* --- Sidebar Filters --- */
+  function setupFilters() {
+      const filterContainer = document.createElement("div");
+      filterContainer.className = "filter-sidebar";
+      filterContainer.innerHTML = `
+          <h3>Filter By:</h3>
+          <div class="filter-group">
+              <h4>Time Period</h4>
+              <label><input type="checkbox" value="19th"> 19th Century</label>
+              <label><input type="checkbox" value="20th"> 20th Century</label>
+              <label><input type="checkbox" value="modern"> Modern Era</label>
+          </div>
+          <div class="filter-group">
+              <h4>Category</h4>
+              <label><input type="checkbox" value="military"> Military History</label>
+              <label><input type="checkbox" value="social"> Social History</label>
+              <label><input type="checkbox" value="economic"> Economic History</label>
+          </div>
+      `;
+      
+      document.querySelector(".archive-wrapper")?.insertAdjacentElement("beforebegin", filterContainer);
+      
+      setupFilterEvents();
+  }
+
+  function setupFilterEvents() {
+    const checkboxes = document.querySelectorAll('.filter-sidebar input[type="checkbox"]');
+    const papers = document.querySelectorAll("#paperList li");
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            // Get all selected filters
+            const selectedFilters = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+            
+            // If no filters selected, show all papers
+            if (selectedFilters.length === 0) {
+                papers.forEach(paper => paper.style.display = "flex");
+                return;
+            }
+            
+            // Filter papers based on selected categories
+            papers.forEach(paper => {
+                const keywords = paper.getAttribute("data-keywords").toLowerCase();
+                const matchesFilter = selectedFilters.some(filter => 
+                    keywords.includes(filter.toLowerCase())
+                );
+                paper.style.display = matchesFilter ? "flex" : "none";
+            });
+            
+            // Update pagination after filtering
+            if (typeof setupPagination === 'function') {
+                setupPagination();
+            }
+        });
+    });
+  }
+
+  /* --- Helper Functions --- */
+  function showPage(pageNum) {
+      const papers = document.querySelectorAll("#paperList li");
+      papers.forEach((paper, index) => {
+          paper.style.display = 
+              (index >= (pageNum - 1) * itemsPerPage && index < pageNum * itemsPerPage)
+              ? "flex"
+              : "none";
+      });
+      currentPage = pageNum;
+  }
+
+  function debounce(func, wait) {
+      let timeout;
+      return function(...args) {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+  }
+
+  function setupPaginationEvents(pageCount) {
+    const prevBtn = document.getElementById("prevPage");
+    const nextBtn = document.getElementById("nextPage");
+    const pageInfo = document.getElementById("pageInfo");
+
+    prevBtn?.addEventListener("click", () => {
+        if (currentPage > 1) {
+            showPage(currentPage - 1);
+            pageInfo.textContent = `Page ${currentPage} of ${pageCount}`;
+        }
+    });
+
+    nextBtn?.addEventListener("click", () => {
+        if (currentPage < pageCount) {
+            showPage(currentPage + 1);
+            pageInfo.textContent = `Page ${currentPage} of ${pageCount}`;
+        }
+    });
+
+    // Disable/enable buttons based on current page
+    function updateButtonStates() {
+        if (prevBtn && nextBtn) {
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === pageCount;
+        }
+    }
+
+    // Initial button state
+    updateButtonStates();
+
+    // Update button states after each page change
+    const observer = new MutationObserver(() => {
+        updateButtonStates();
+    });
+
+    if (pageInfo) {
+        observer.observe(pageInfo, { characterData: true, childList: true });
+    }
+  }
+
+  function handleSearch(event) {
+    const query = event.target.value.toLowerCase();
+    if (query.length < 2) return;
+
+    const results = searchIndex.search(query);
+    const suggestions = document.getElementById("searchSuggestions");
+    
+    if (suggestions) {
+        suggestions.innerHTML = results
+            .slice(0, 5)
+            .map(result => `<div class="suggestion">${result.ref}</div>`)
+            .join('');
+    }
+  }
+
+  // Initialize all features
+  if (document.querySelector(".archive-wrapper")) {
+      setupPagination();
+      setupSearch();
+      setupFilters();
+  }
+  setupDarkMode();
 });
