@@ -4,18 +4,20 @@ document.addEventListener("DOMContentLoaded", function () {
        ------------------------------------------- */
   const searchInput = document.getElementById("searchInput");
   if (searchInput) {
-    searchInput.addEventListener("input", function () {
+    // Replace plain event with debounced handler
+    searchInput.addEventListener("input", debounce(function () {
       const query = this.value.toLowerCase();
+      // Cache paper list elements once per invocation
       const papers = document.querySelectorAll("#paperList li");
       papers.forEach(function (paper) {
         const keywords = paper.getAttribute("data-keywords").toLowerCase();
-        paper.style.display = keywords.indexOf(query) !== -1 ? "" : "none";
+        paper.style.display = keywords.includes(query) ? "" : "none";
       });
-    });
+    }, 300));
   }
 
   /* -------------------------------------------
-       2. Dynamic Content Loading
+       2. Dynamic Content Loading with error handling
        ------------------------------------------- */
   const PAPERS_DATA = [
     {
@@ -49,28 +51,36 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (loadMoreBtn) {
     loadMoreBtn.addEventListener("click", function () {
-      const paperList = document.getElementById("paperList");
-      let papersAdded = 0;
+      try {
+        const paperList = document.getElementById("paperList");
+        const fragment = document.createDocumentFragment(); // batch updates to limit reflows
+        let papersAdded = 0;
 
-      // Load next batch of papers
-      while (papersAdded < PAPERS_PER_LOAD && currentIndex < PAPERS_DATA.length) {
-        const paper = PAPERS_DATA[currentIndex];
-        if (!loadedPaperIds.has(paper.id)) {
-          const li = document.createElement("li");
-          li.setAttribute("data-keywords", paper.keywords);
-          li.innerHTML = `<a href="${paper.pdfLink}" target="_blank">${paper.title}</a>
+        // Load next batch of papers
+        while (papersAdded < PAPERS_PER_LOAD && currentIndex < PAPERS_DATA.length) {
+          const paper = PAPERS_DATA[currentIndex];
+          if (!loadedPaperIds.has(paper.id)) {
+            const li = document.createElement("li");
+            li.setAttribute("data-keywords", paper.keywords);
+            li.setAttribute("data-id", paper.id); // << Added data-id attribute
+            li.innerHTML = `<a href="${paper.pdfLink}" target="_blank">${paper.title}</a>
                          <span class="author">by ${paper.author}</span>`;
-          paperList.appendChild(li);
-          loadedPaperIds.add(paper.id);
-          papersAdded++;
+            fragment.appendChild(li);
+            loadedPaperIds.add(paper.id);
+            papersAdded++;
+          }
+          currentIndex++;
         }
-        currentIndex++;
-      }
+        paperList.appendChild(fragment); // bulk insert to reduce reflows
 
-      // Disable button if all papers are loaded
-      if (currentIndex >= PAPERS_DATA.length) {
-        loadMoreBtn.disabled = true;
-        loadMoreBtn.textContent = "No More Papers";
+        // Disable button if all papers are loaded
+        if (currentIndex >= PAPERS_DATA.length) {
+          loadMoreBtn.disabled = true;
+          loadMoreBtn.textContent = "No More Papers";
+        }
+      } catch (error) {
+        console.error("Error loading more papers:", error);
+        alert("Sorry, we could not load more papers at this time. Please try again later.");
       }
     });
   }
@@ -198,12 +208,13 @@ document.addEventListener("DOMContentLoaded", function () {
       }
   }
 
-  /* --- Dark Mode Toggle --- */
+  /* --- Dark Mode Toggle Enhancement --- */
   function setupDarkMode() {
       const toggle = document.createElement("button");
       toggle.id = "darkModeToggle";
       toggle.innerHTML = "🌓";
       toggle.className = "dark-mode-toggle";
+      toggle.setAttribute("aria-label", "Toggle Dark Mode");
       
       document.querySelector("header .container").appendChild(toggle);
       
@@ -299,44 +310,41 @@ document.addEventListener("DOMContentLoaded", function () {
       };
   }
 
+  /* --- Pagination ARIA Attributes --- */
   function setupPaginationEvents(pageCount) {
     const prevBtn = document.getElementById("prevPage");
     const nextBtn = document.getElementById("nextPage");
     const pageInfo = document.getElementById("pageInfo");
 
-    prevBtn?.addEventListener("click", () => {
+    // Add ARIA labels for clarity
+    if (prevBtn) {
+      prevBtn.setAttribute("aria-label", "Previous page");
+      prevBtn.addEventListener("click", () => {
         if (currentPage > 1) {
-            showPage(currentPage - 1);
-            pageInfo.textContent = `Page ${currentPage} of ${pageCount}`;
+          showPage(currentPage - 1);
+          pageInfo.textContent = `Page ${currentPage} of ${pageCount}`;
         }
-    });
-
-    nextBtn?.addEventListener("click", () => {
+      });
+    }
+    if (nextBtn) {
+      nextBtn.setAttribute("aria-label", "Next page");
+      nextBtn.addEventListener("click", () => {
         if (currentPage < pageCount) {
-            showPage(currentPage + 1);
-            pageInfo.textContent = `Page ${currentPage} of ${pageCount}`;
+          showPage(currentPage + 1);
+          pageInfo.textContent = `Page ${currentPage} of ${pageCount}`;
         }
-    });
+      });
+    }
 
-    // Disable/enable buttons based on current page
     function updateButtonStates() {
-        if (prevBtn && nextBtn) {
-            prevBtn.disabled = currentPage === 1;
-            nextBtn.disabled = currentPage === pageCount;
-        }
+      if (prevBtn && nextBtn) {
+          prevBtn.disabled = currentPage === 1;
+          nextBtn.disabled = currentPage === pageCount;
+      }
     }
-
-    // Initial button state
     updateButtonStates();
-
-    // Update button states after each page change
-    const observer = new MutationObserver(() => {
-        updateButtonStates();
-    });
-
-    if (pageInfo) {
-        observer.observe(pageInfo, { characterData: true, childList: true });
-    }
+    const observer = new MutationObserver(() => { updateButtonStates(); });
+    if (pageInfo) { observer.observe(pageInfo, { characterData: true, childList: true }); }
   }
 
   function handleSearch(event) {

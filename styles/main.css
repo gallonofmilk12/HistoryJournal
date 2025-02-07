@@ -8,12 +8,15 @@ html, body {
 
 body {
     font-family: 'Source Sans Pro', sans-serif;
-    font-size: 18px;
+    font-size: 1rem; /* Base font size; adjust with rem in media queries */
     line-height: 1.7;
     color: #222;
     background: #fff;
     margin: 0;
     padding: 0;
+    /* Added vendor prefixes for flex display */
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -53,8 +56,8 @@ blockquote {
 
 /* Container and Grid Adjustments */
 .container {
-    width: 85%;
-    max-width: 1100px;
+    width: 90%;
+    max-width: 70rem; /* 70rem is roughly equivalent to 1120px (if 1rem = 16px) */
     margin: 0 auto;
     padding: 2rem;
 }
@@ -194,7 +197,12 @@ footer {
     background: rgba(0, 0, 0, 0.5);
     display: none;
     /* Hidden by default */
+    /* Added vendor prefixes for centering modal content */
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
     justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
 }
 
@@ -305,7 +313,7 @@ aside h3 {
 @media (max-width: 992px) {
     .container {
         width: 95%;
-        padding: 1rem;
+        padding: 1.5rem;
     }
 
     header h1 {
@@ -325,7 +333,7 @@ aside h3 {
 @media (max-width: 768px) {
     /* Typography adjustments */
     body {
-        font-size: 16px;
+        font-size: 0.9rem;
         line-height: 1.6;
     }
 
@@ -345,7 +353,7 @@ aside h3 {
 
     nav ul li a {
         display: block;
-        padding: 0.8rem;
+        padding: 0.7rem;
         background: rgba(255, 255, 255, 0.1);
         border-radius: 4px;
     }
@@ -436,6 +444,27 @@ aside h3 {
 
     .profile-pic {
         width: 100px;
+    }
+
+    body {
+        font-size: 1.1rem; /* Increased base font size */
+        line-height: 1.8;
+    }
+    
+    p {
+        margin-bottom: 1.75rem; /* Extra bottom margin */
+    }
+    
+    header, footer {
+        padding: 1.5rem 1rem; /* Adjust header/footer padding */
+    }
+    
+    .container {
+        padding: 1.5rem; /* Extra container padding */
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        margin-bottom: 1rem; /* Increased heading spacing */
     }
 }
 
@@ -563,6 +592,17 @@ body.dark-mode a {
 /* Dark Mode Filter Sidebar */
 body.dark-mode .filter-sidebar {
     background: #2d2d2d;
+}
+
+/* Smooth transitions for interactive elements */
+button, .page-btn, #backToTop, .dark-mode-toggle {
+    transition: background 0.3s ease, color 0.3s ease, border 0.3s ease;
+}
+
+/* Responsive Images */
+img {
+    max-width: 100%;
+    height: auto;
 }
 
 /* Responsive Adjustments */
